@@ -1,4 +1,4 @@
-# подключение встроенных в python библиотек
+# подключение встроенных в Python библиотек
 import os
 from datetime import datetime as dt
 from time import sleep
@@ -18,6 +18,7 @@ def get_json_data(url):
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:
+            # Вывод ошибки и повтор запроса
             print(f"Ошибка при получении данных (попытка {attempt + 1}/{MAX_RETRIES}): {e}")
             if attempt < MAX_RETRIES - 1:
                 sleep(5)  # Пауза перед повторной попыткой
@@ -63,7 +64,7 @@ def generate_report_content(user, tasks):
 
 def create_report_file(user_name, report_content):
     report_filename = f"{user_name}.txt"
-    temp_report_filename = f"temp_{user_name}.txt"  # нужен для проверки корректности записи
+    temp_report_filename = f"temp_{user_name}.txt"  # Используется для проверки корректности записи
     old_report_filename = f"old_{user_name}_{dt.now().strftime('%Y-%m-%dT%H:%M')}.txt"
 
     try:
@@ -83,6 +84,7 @@ def create_report_file(user_name, report_content):
             os.rename(os.path.join('tasks', temp_report_filename), os.path.join('tasks', report_filename))
 
         else:
+            # В случае проблем с записью файла
             print("Внимание: Файл записан не полностью или некорректно. Удаление временного файла.")
             raise RuntimeError()
 
@@ -99,12 +101,14 @@ def create_report_file(user_name, report_content):
 
 def create_reports():
     try:
+        # Получение данных о задачах и пользователях
         tasks = get_json_data(url_todos)
         users = get_json_data(url_users)
 
         if not os.path.exists('tasks'):
             os.makedirs('tasks')
 
+        # Создание отчета для каждого пользователя
         for user in users:
             user_id = user.get('id')
             user_name = user['username']
