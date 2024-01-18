@@ -64,37 +64,30 @@ def generate_report_content(user, tasks):
 
 def create_report_file(user_name, report_content):
     report_filename = f"{user_name}.txt"
-    temp_report_filename = f"temp_{user_name}.txt"  # Используется для проверки корректности записи
     old_report_filename = f"old_{user_name}_{dt.now().strftime('%Y-%m-%dT%H:%M')}.txt"
 
     try:
-        # Создание временного файла
-        with open(os.path.join('tasks', temp_report_filename), 'w') as temp_report_file:
-            temp_report_file.write(report_content)
+        # Переименование актуального файла в старый
+        if os.path.exists(os.path.join('tasks', report_filename)):
+            os.rename(os.path.join('tasks', report_filename), os.path.join('tasks', old_report_filename))
+
+        # Запись нового отчёта в актуальный файл
+        with open(os.path.join('tasks', report_filename), 'w') as report_file:
+            report_file.write(report_content)
 
         # Проверка целостности и корректности временного файла
         expected_size = len(report_content.encode('utf-8'))
-        actual_size = os.path.getsize(os.path.join('tasks', temp_report_filename))
+        actual_size = os.path.getsize(os.path.join('tasks', report_filename))
 
-        if expected_size == actual_size:
-            # Если всё корректно, переименование актуального файла в старый и временного в актуальный
-            if os.path.exists(os.path.join('tasks', report_filename)):
-                os.rename(os.path.join('tasks', report_filename), os.path.join('tasks', old_report_filename))
-
-            os.rename(os.path.join('tasks', temp_report_filename), os.path.join('tasks', report_filename))
-
-        else:
+        if expected_size != actual_size:
             # В случае проблем с записью файла
-            print("Внимание: Файл записан не полностью или некорректно. Удаление временного файла.")
+            print("Внимание: Файл записан не полностью или некорректно. Откат изменений файла.")
             raise RuntimeError()
 
     except Exception as e:
         print(f"Ошибка при обработке файла: {e}")
 
-        # В случае ошибки, удаление старого файла
-        if os.path.exists(os.path.join('tasks', temp_report_filename)):
-            os.remove(os.path.join('tasks', temp_report_filename))
-        # В случае ошибки, восстановление старого файла
+        # В случае ошибки, восстановление актуального файла
         if os.path.exists(os.path.join('tasks', old_report_filename)):
             os.rename(os.path.join('tasks', old_report_filename), os.path.join('tasks', report_filename))
 
