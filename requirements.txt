@@ -1,0 +1,5 @@
+# requirements.txt
+# This file specifies the project dependencies.
+# Install the dependencies using: pip install -r requirements.txt
+
+requests>=2.31.0
