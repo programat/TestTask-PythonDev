@@ -115,6 +115,7 @@ def create_reports():
     except Exception as e:
         print(f"Неожиданная ошибка: {e}")
 
+    print("Программа успешно завершила выполнение!")
 
 if __name__ == '__main__':
     create_reports()
