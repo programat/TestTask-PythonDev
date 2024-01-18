@@ -22,8 +22,8 @@ def get_json_data(url):
             if attempt < MAX_RETRIES - 1:
                 sleep(5)  # Пауза перед повторной попыткой
             else:
-                print(f"Не удалось получить данные после {MAX_RETRIES} попыток. Программа завершает выполнение.")
-                exit(1)
+                raise RuntimeError(f"Не удалось получить данные после {MAX_RETRIES} попыток. Программа завершает "
+                                   f"выполнение.")
 
 
 def generate_report_content(user, tasks):
