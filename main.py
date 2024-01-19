@@ -42,20 +42,20 @@ def generate_report_content(user, tasks):
     )
 
     if tasks:
-        active_tasks = [task for task in tasks
-                        if (not task.get('completed', False) is not None) and (task.get('title') is not None)]
-        completed_tasks = [task for task in tasks
-                           if (task.get('completed', True) is not None) and (task.get('title') is not None)]
+        active_tasks = [task for task in tasks if not task.get('completed', False) and task.get('title')]
+        completed_tasks = [task for task in tasks if task.get('completed', False) and task.get('title')]
 
         # Проверка корректно заполоненных задач
         total_tasks = len(tasks)
         correct_tasks = len(active_tasks) + len(completed_tasks)
         if correct_tasks != total_tasks:
             print(f"Внимание! У пользователя с id={user.get('id')} "
-                  f"неверно заполненных задач: {total_tasks - correct_tasks} из {total_tasks}")
+                  f"неверно заполненных задач: {abs(total_tasks - correct_tasks)} из {total_tasks}")
         if correct_tasks == 0:
             report_content += "Пользователь не имеет задач.\n"
             return report_content
+
+        report_content += f"Всего задач: {correct_tasks}\n\n"
 
         def format_task_title(task_title):
             return task_title[:46] + '…' if len(task_title) > 46 else task_title
@@ -106,87 +106,8 @@ def create_report_file(user_name, report_content):
 def create_reports():
     try:
         # Получение данных о задачах и пользователях
-        # tasks = get_json_data(url_todos)
-        # users = get_json_data(url_users)
-
-        # Тестовые пользователи
-        users = [
-            {
-                "id": 1,
-                "name": "Leanne Graham",
-                "email": "Sincere@april.biz",
-                "address": {
-                    "street": "Kulas Light",
-                    "suite": "Apt. 556",
-                    "city": "Gwenborough",
-                    "zipcode": "92998-3874",
-                    "geo": {
-                        "lat": "-37.3159",
-                        "lng": "81.1496"
-                    }
-                },
-                "phone": "1-770-736-8031 x56442",
-                "website": "hildegard.org",
-            },
-            {
-                "id": 2,
-                "name": "Ervin Howell",
-                "username": "Antonette",
-                "email": "Shanna@melissa.tv",
-                "address": {
-                    "street": "Victor Plains",
-                    "suite": "Suite 879",
-                    "city": "Wisokyburgh",
-                    "zipcode": "90566-7771",
-                    "geo": {
-                        "lat": "-43.9509",
-                        "lng": "-34.4618"
-                    }
-                },
-                "phone": "010-692-6593 x09125",
-                "website": "anastasia.net",
-                "company": {
-                    "name": "Deckow-Crist",
-                    "catchPhrase": "Proactive didactic contingency",
-                    "bs": "synergize scalable supply-chains"
-                }
-            },
-            {
-                "id": 3,
-                "name": "John Doe",
-                "username": "johndoe",
-                "email": None,  # Пример с отсутствующим email
-            },
-            {
-                "id": 4,
-                "name": "Jane Doe",
-                "username": "janedoe",
-                "email": "jane@example.com",
-                "company": None,  # Пример без компании
-            },
-            {
-                "id": 5,
-                "name": "No Company User",
-                "username": "nocompany",
-                "email": "nocompany@example.com",
-                "company": {
-                    "name": None,  # Пример с отсутствующим или None значением для name
-                    "catchPhrase": "Some catch phrase",
-                    "bs": "Some bs"
-                }
-            }
-        ]
-
-        # Тестовые задачи для пользователей (второму пользователю добавлены задачи)
-        tasks = [
-            {"userId": 2, "id": 1, "title": "Task 1", "completed": False},
-            {"userId": 2, "id": 2, "title": "Task 2", "completed": True},
-            {"userId": 2, "id": 3, "title": "Task 3 with a very long title that needs to be truncated",
-             "completed": False},
-            {"userId": 2, "id": 4, "title": "Task 4", "completed": True},
-            {"userId": 2, "id": 5, "title": "Task 5", "completed": False},
-            {"userId": 5, "id": 6, "title": None, "completed": False},
-        ]
+        tasks = get_json_data(url_todos)
+        users = get_json_data(url_users)
 
         if not os.path.exists('tasks'):
             os.makedirs('tasks')
@@ -212,10 +133,10 @@ def create_reports():
                     if report_content is not None:
                         create_report_file(user_name, report_content)
 
-        print("Программа успешно завершила выполнение!")
+        print("\nПрограмма успешно завершила выполнение!")
 
     except Exception as e:
-        print(f"Неожиданная ошибка: {e}")
+        print(f"\nПрограмма завершила работу с неожиданной ошибкой: {e}")
 
 
 if __name__ == '__main__':
